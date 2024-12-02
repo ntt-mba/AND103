@@ -28,7 +28,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-mongoose.connect('mongodb+srv://taint:Tainguyen26@cluster.4po6q.mongodb.net//md19301')
+mongoose.connect('mongodb+srv://taint:Tainguyen26@cluster.4po6q.mongodb.net/md19301')
   .then(() => console.log('>>>>>>>>>> DB Connected!!!!!!'))
   .catch(err => console.log('>>>>>>>>> DB Error: ', err));
 

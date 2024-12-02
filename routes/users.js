@@ -22,7 +22,7 @@ router.get("/detail/:id", async function (req, res) {
     if (detail) {
       res.status(200).json(detail);
     } else {
-      res.status(400).json({ status: true, message: "khoong tìm thấy" });
+      res.status(400).json({ status: true, message: "không tìm thấy" });
     }
   } catch (error) {
     res.status(400).json({ status: false, message: "có lỗi xảy ra " })
@@ -71,17 +71,28 @@ router.post("/send-mail", async function (req, res, next) {
 //login
 router.post("/login", async function (req, res) {
   try {
-    const { user, pass } = req.body;
-    const checkUser = await userModel.findOne({ username: user, password: pass });
+    const { username, password } = req.body;
+
+    // Tìm người dùng trong cơ sở dữ liệu
+    const checkUser = await userModel.findOne({ username: username, password: password });
     if (checkUser == null) {
-      res.status(400).json({ status: false, message: "tên đăng nhập hoặc mật khẩu sai" });
-    } else {
-      var token = JWT.sign({ username: user }, config.SECRETKEY, { expiresIn: '30s' });
-      var refreshToken = JWT.sign({ username: user }, config.SECRETKEY, { expiresIn: "1d" });
-      res.status(200).json({ status: true, message: "đăng nhập thành công", token: token, refreshToken: refreshToken });
+      return res.status(400).json({ status: false, message: "Tên đăng nhập hoặc mật khẩu sai" });
     }
+
+    // Tạo JWT và refresh token
+    var token = JWT.sign({ username: checkUser.username }, config.SECRETKEY, { expiresIn: '30s' });
+    var refreshToken = JWT.sign({ username: checkUser.username }, config.SECRETKEY, { expiresIn: "1d" });
+
+    // Trả về phản hồi
+    return res.status(200).json({
+      status: true,
+      message: "Đăng nhập thành công",
+      token: token,
+      refreshToken: refreshToken,
+    });
   } catch (error) {
-    res.status(400).json({ status: false, message: "đã có lỗi xảy ra" });
+    console.error(error);
+    return res.status(400).json({ status: false, message: "Đã có lỗi xảy ra" });
   }
 });
 
